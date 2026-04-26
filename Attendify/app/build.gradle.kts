@@ -2,14 +2,16 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
+    alias(libs.plugins.ksp)
+    id("com.google.gms.google-services")
 }
 
 android {
-    namespace = "com.example.attendanceapp"
+    namespace = "com.attendance.attendanceapp"
     compileSdk = 36
 
     defaultConfig {
-        applicationId = "com.example.attendanceapp"
+        applicationId = "com.attendance.attendanceapp"
         minSdk = 24
         targetSdk = 36
         versionCode = 1
@@ -56,4 +58,13 @@ dependencies {
     androidTestImplementation(libs.androidx.ui.test.junit4)
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
+
+    // Room
+    implementation(libs.androidx.room.runtime)
+    implementation(libs.androidx.room.ktx)
+    ksp(libs.androidx.room.compiler)
+
+    implementation(platform("com.google.firebase:firebase-bom:33.1.2"))
+    implementation("com.google.firebase:firebase-auth")
+    implementation("com.google.firebase:firebase-firestore")
 }
