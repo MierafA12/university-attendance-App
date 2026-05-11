@@ -13,7 +13,7 @@ import kotlinx.coroutines.flow.Flow
 interface CourseDao {
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insertCourse(course: CourseEntity): Long
+    suspend fun insertCourse(course: CourseEntity)
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertAll(courses: List<CourseEntity>)
@@ -25,10 +25,10 @@ interface CourseDao {
     suspend fun deleteCourse(course: CourseEntity)
 
     @Query("SELECT * FROM courses WHERE courseId = :courseId")
-    fun getCourseById(courseId: Int): Flow<CourseEntity?>
+    fun getCourseById(courseId: String): Flow<CourseEntity?>
 
     @Query("SELECT * FROM courses WHERE departmentId = :departmentId")
-    fun getCoursesByDepartment(departmentId: Int): Flow<List<CourseEntity>>
+    fun getCoursesByDepartment(departmentId: String): Flow<List<CourseEntity>>
 
     @Query("SELECT * FROM courses")
     fun getAllCourses(): Flow<List<CourseEntity>>
@@ -37,5 +37,5 @@ interface CourseDao {
     suspend fun getCourseByName(name: String): CourseEntity?
 
     @Query("DELETE FROM courses WHERE courseId = :courseId")
-    suspend fun deleteCourseById(courseId: Int)
+    suspend fun deleteCourseById(courseId: String)
 }
