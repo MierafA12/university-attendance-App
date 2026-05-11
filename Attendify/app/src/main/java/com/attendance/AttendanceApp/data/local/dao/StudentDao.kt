@@ -22,13 +22,13 @@ interface StudentDao {
     suspend fun deleteStudent(student: StudentEntity)
 
     @Query("SELECT * FROM students WHERE studentId = :studentId")
-    fun getStudentById(studentId: Int): Flow<StudentEntity?>
+    fun getStudentById(studentId: String): Flow<StudentEntity?>
 
     @Query("SELECT * FROM students WHERE userId = :userId LIMIT 1")
-    fun getStudentByUserId(userId: Int): Flow<StudentEntity?>
+    fun getStudentByUserId(userId: String): Flow<StudentEntity?>
 
     @Query("SELECT * FROM students WHERE departmentId = :departmentId")
-    fun getStudentsByDepartment(departmentId: Int): Flow<List<StudentEntity>>
+    fun getStudentsByDepartment(departmentId: String): Flow<List<StudentEntity>>
 
     @Query("SELECT * FROM students WHERE year = :year")
     fun getStudentsByYear(year: String): Flow<List<StudentEntity>>
@@ -37,5 +37,5 @@ interface StudentDao {
     fun getAllStudents(): Flow<List<StudentEntity>>
 
     @Query("DELETE FROM students WHERE studentId = :studentId")
-    suspend fun deleteStudentById(studentId: Int)
+    suspend fun deleteStudentById(studentId: String)
 }
