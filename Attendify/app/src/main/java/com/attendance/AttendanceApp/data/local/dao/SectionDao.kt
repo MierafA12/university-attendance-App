@@ -21,8 +21,8 @@ interface SectionDao {
     suspend fun deleteSection(section: SectionEntity)
 
     @Query("SELECT * FROM course_sections WHERE courseId = :courseId")
-    fun getSectionsByCourse(courseId: Int): Flow<List<SectionEntity>>
+    fun getSectionsByCourse(courseId: String): Flow<List<SectionEntity>>
 
     @Query("DELETE FROM course_sections WHERE sectionId = :sectionId")
-    suspend fun deleteSectionById(sectionId: Int)
+    suspend fun deleteSectionById(sectionId: String)
 }
