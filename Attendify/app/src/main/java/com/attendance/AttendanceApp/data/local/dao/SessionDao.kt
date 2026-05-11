@@ -22,23 +22,26 @@ interface SessionDao {
     suspend fun deleteSession(session: SessionEntity)
 
     @Query("SELECT * FROM attendance_sessions WHERE sessionId = :sessionId")
-    fun getSessionById(sessionId: Int): Flow<SessionEntity?>
+    fun getSessionById(sessionId: String): Flow<SessionEntity?>
 
     @Query("SELECT * FROM attendance_sessions WHERE scheduleId = :scheduleId")
-    fun getSessionsBySchedule(scheduleId: Int): Flow<List<SessionEntity>>
+    fun getSessionsBySchedule(scheduleId: String): Flow<List<SessionEntity>>
 
     @Query("SELECT * FROM attendance_sessions WHERE isActive = 1 AND scheduleId = :scheduleId LIMIT 1")
-    fun getActiveSessionForSchedule(scheduleId: Int): Flow<SessionEntity?>
+    fun getActiveSessionForSchedule(scheduleId: String): Flow<SessionEntity?>
 
     @Query("SELECT * FROM attendance_sessions WHERE qrCode = :qrCode LIMIT 1")
     suspend fun getSessionByQrCode(qrCode: String): SessionEntity?
 
     @Query("UPDATE attendance_sessions SET isActive = 0 WHERE sessionId = :sessionId")
-    suspend fun deactivateSession(sessionId: Int)
+    suspend fun deactivateSession(sessionId: String)
 
     @Query("SELECT * FROM attendance_sessions ORDER BY date DESC")
     fun getAllSessions(): Flow<List<SessionEntity>>
 
+    @Query("UPDATE attendance_sessions SET isActive = 0 WHERE isActive = 1")
+    suspend fun deactivateAllSessions()
+
     @Query("DELETE FROM attendance_sessions WHERE sessionId = :sessionId")
-    suspend fun deleteSessionById(sessionId: Int)
+    suspend fun deleteSessionById(sessionId: String)
 }
