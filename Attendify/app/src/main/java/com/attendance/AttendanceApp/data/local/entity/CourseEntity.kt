@@ -7,19 +7,12 @@ import androidx.room.PrimaryKey
 
 @Entity(
     tableName = "courses",
-    foreignKeys = [
-        ForeignKey(
-            entity = DepartmentEntity::class,
-            parentColumns = ["id"],
-            childColumns = ["departmentId"],
-            onDelete = ForeignKey.CASCADE
-        )
-    ],
     indices = [Index(value = ["departmentId"])]
 )
 data class CourseEntity(
-    @PrimaryKey(autoGenerate = true) val courseId: Int = 0,
+    @PrimaryKey val courseId: String,
     val name: String,
-    val departmentId: Int,
-    val year: String
+    val departmentId: String,
+    val year: String,
+    val semester: String
 )
