@@ -7,29 +7,15 @@ import androidx.room.PrimaryKey
 
 @Entity(
     tableName = "attendance_records",
-    foreignKeys = [
-        ForeignKey(
-            entity = SessionEntity::class,
-            parentColumns = ["sessionId"],
-            childColumns = ["sessionId"],
-            onDelete = ForeignKey.CASCADE
-        ),
-        ForeignKey(
-            entity = StudentEntity::class,
-            parentColumns = ["studentId"],
-            childColumns = ["studentId"],
-            onDelete = ForeignKey.CASCADE
-        )
-    ],
     indices = [
         Index(value = ["sessionId", "studentId"], unique = true),
         Index(value = ["studentId"])
     ]
 )
 data class AttendanceEntity(
-    @PrimaryKey(autoGenerate = true) val id: Int = 0,
-    val sessionId: Int,
-    val studentId: Int,
+    @PrimaryKey val id: String,
+    val sessionId: String,
+    val studentId: String,
     val status: String, // "Present", "Absent"
     val timestamp: Long
 )
