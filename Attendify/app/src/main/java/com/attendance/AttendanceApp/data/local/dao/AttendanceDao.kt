@@ -22,26 +22,26 @@ interface AttendanceDao {
     suspend fun deleteAttendance(attendance: AttendanceEntity)
 
     @Query("SELECT * FROM attendance_records WHERE id = :id")
-    fun getAttendanceById(id: Int): Flow<AttendanceEntity?>
+    fun getAttendanceById(id: String): Flow<AttendanceEntity?>
 
     /** All attendance records for a specific session */
     @Query("SELECT * FROM attendance_records WHERE sessionId = :sessionId")
-    fun getAttendanceBySession(sessionId: Int): Flow<List<AttendanceEntity>>
+    fun getAttendanceBySession(sessionId: String): Flow<List<AttendanceEntity>>
 
     /** All attendance records for a specific student across all sessions */
     @Query("SELECT * FROM attendance_records WHERE studentId = :studentId ORDER BY timestamp DESC")
-    fun getAttendanceByStudent(studentId: Int): Flow<List<AttendanceEntity>>
+    fun getAttendanceByStudent(studentId: String): Flow<List<AttendanceEntity>>
 
     /** Check if a student already has an attendance record for a given session */
     @Query("SELECT * FROM attendance_records WHERE sessionId = :sessionId AND studentId = :studentId LIMIT 1")
-    suspend fun getAttendanceRecord(sessionId: Int, studentId: Int): AttendanceEntity?
+    suspend fun getAttendanceRecord(sessionId: String, studentId: String): AttendanceEntity?
 
     /** Count of a specific status for a student (e.g., "PRESENT", "ABSENT", "LATE") */
     @Query("""
         SELECT COUNT(*) FROM attendance_records 
         WHERE studentId = :studentId AND status = :status
     """)
-    fun countAttendanceByStatus(studentId: Int, status: String): Flow<Int>
+    fun countAttendanceByStatus(studentId: String, status: String): Flow<Int>
 
     /** All records for a student within a schedule (join through sessions) */
     @Query("""
@@ -50,8 +50,8 @@ interface AttendanceDao {
         WHERE ar.studentId = :studentId AND s.scheduleId = :scheduleId
         ORDER BY s.date DESC
     """)
-    fun getAttendanceForStudentInSchedule(studentId: Int, scheduleId: Int): Flow<List<AttendanceEntity>>
+    fun getAttendanceForStudentInSchedule(studentId: String, scheduleId: String): Flow<List<AttendanceEntity>>
 
     @Query("DELETE FROM attendance_records WHERE id = :id")
-    suspend fun deleteAttendanceById(id: Int)
+    suspend fun deleteAttendanceById(id: String)
 }
