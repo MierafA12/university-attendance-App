@@ -12,7 +12,7 @@ import kotlinx.coroutines.flow.Flow
 @Dao
 interface DepartmentDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insertDepartment(department: DepartmentEntity): Long
+    suspend fun insertDepartment(department: DepartmentEntity)
 
     @Update
     suspend fun updateDepartment(department: DepartmentEntity)
@@ -24,8 +24,8 @@ interface DepartmentDao {
     fun getAllDepartments(): Flow<List<DepartmentEntity>>
 
     @Query("SELECT * FROM departments WHERE id = :id")
-    fun getDepartmentById(id: Int): Flow<DepartmentEntity?>
+    fun getDepartmentById(id: String): Flow<DepartmentEntity?>
 
     @Query("DELETE FROM departments WHERE id = :id")
-    suspend fun deleteDepartmentById(id: Int)
+    suspend fun deleteDepartmentById(id: String)
 }
