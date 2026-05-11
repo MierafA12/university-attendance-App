@@ -22,8 +22,9 @@ import androidx.room.PrimaryKey
     indices = [Index(value = ["courseId"])]
 )
 data class SectionEntity(
-    @PrimaryKey(autoGenerate = true) val sectionId: Int = 0,
-    val courseId: Int,
+    @PrimaryKey val sectionId: String,
+    val courseId: String,
     val name: String,
-    val year: String
+    val year: String,
+    val semester: String
 )
