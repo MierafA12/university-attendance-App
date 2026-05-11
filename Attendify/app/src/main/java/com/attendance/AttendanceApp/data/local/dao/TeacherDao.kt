@@ -22,17 +22,17 @@ interface TeacherDao {
     suspend fun deleteTeacher(teacher: TeacherEntity)
 
     @Query("SELECT * FROM teachers WHERE teacherId = :teacherId")
-    fun getTeacherById(teacherId: Int): Flow<TeacherEntity?>
+    fun getTeacherById(teacherId: String): Flow<TeacherEntity?>
 
     @Query("SELECT * FROM teachers WHERE userId = :userId LIMIT 1")
-    fun getTeacherByUserId(userId: Int): Flow<TeacherEntity?>
+    fun getTeacherByUserId(userId: String): Flow<TeacherEntity?>
 
     @Query("SELECT * FROM teachers WHERE departmentId = :departmentId")
-    fun getTeachersByDepartment(departmentId: Int): Flow<List<TeacherEntity>>
+    fun getTeachersByDepartment(departmentId: String): Flow<List<TeacherEntity>>
 
     @Query("SELECT * FROM teachers")
     fun getAllTeachers(): Flow<List<TeacherEntity>>
 
     @Query("DELETE FROM teachers WHERE teacherId = :teacherId")
-    suspend fun deleteTeacherById(teacherId: Int)
+    suspend fun deleteTeacherById(teacherId: String)
 }
