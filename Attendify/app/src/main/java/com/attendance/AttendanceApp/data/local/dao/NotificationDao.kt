@@ -20,12 +20,18 @@ interface NotificationDao {
     @Delete
     suspend fun deleteNotification(notification: NotificationEntity)
 
-    @Query("SELECT * FROM notifications WHERE studentId = :studentId ORDER BY createdAt DESC")
-    fun getNotificationsByStudent(studentId: Int): Flow<List<NotificationEntity>>
+    @Query("SELECT * FROM notifications WHERE userId IN (:userIds) ORDER BY createdAt DESC")
+    fun getNotificationsByUserIds(userIds: List<String>): Flow<List<NotificationEntity>>
+
+    @Query("SELECT COUNT(*) FROM notifications WHERE userId IN (:userIds) AND isRead = 0")
+    fun getUnreadCountByUserIds(userIds: List<String>): Flow<Int>
 
     @Query("UPDATE notifications SET isRead = 1 WHERE id = :id")
     suspend fun markAsRead(id: Int)
 
     @Query("DELETE FROM notifications WHERE id = :id")
     suspend fun deleteNotificationById(id: Int)
+
+    @Query("DELETE FROM notifications WHERE userId = :userId")
+    suspend fun deleteAllNotifications(userId: String)
 }
