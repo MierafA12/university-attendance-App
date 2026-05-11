@@ -12,8 +12,8 @@ import kotlinx.coroutines.flow.Flow
 @Dao
 interface UserDao {
 
-    @Insert(onConflict = OnConflictStrategy.ABORT)
-    suspend fun insertUser(user: UserEntity): Long
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertUser(user: UserEntity)
 
     @Update
     suspend fun updateUser(user: UserEntity)
@@ -22,7 +22,7 @@ interface UserDao {
     suspend fun deleteUser(user: UserEntity)
 
     @Query("SELECT * FROM users WHERE id = :id")
-    fun getUserById(id: Int): Flow<UserEntity?>
+    fun getUserById(id: String): Flow<UserEntity?>
 
     @Query("SELECT * FROM users WHERE email = :email LIMIT 1")
     suspend fun getUserByEmail(email: String): UserEntity?
@@ -37,5 +37,5 @@ interface UserDao {
     fun getAllUsers(): Flow<List<UserEntity>>
 
     @Query("DELETE FROM users WHERE id = :id")
-    suspend fun deleteUserById(id: Int)
+    suspend fun deleteUserById(id: String)
 }
