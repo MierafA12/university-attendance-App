@@ -45,7 +45,7 @@ fun OnboardingScreen(
             title = "Digital Attendance",
             description = "Say goodbye to paper sheets. Track attendance effortlessly with our smart digital solution.",
             imageAsset = "attendance.webp",
-            backgroundColor = Color(0xFF1A237E)
+            backgroundColor = Color(0xFF006064)
         ),
         OnboardingPage(
             title = "Quick QR Scan",
@@ -57,7 +57,7 @@ fun OnboardingScreen(
             title = "Real-time Reports",
             description = "Get instant insights and automated reports for every class session. Export data with one tap.",
             imageAsset = "report.webp",
-            backgroundColor = Color(0xFF0D47A1)
+            backgroundColor = Color(0xFF006064)
         )
     )
 
