@@ -27,10 +27,10 @@ interface NotificationDao {
     fun getUnreadCountByUserIds(userIds: List<String>): Flow<Int>
 
     @Query("UPDATE notifications SET isRead = 1 WHERE id = :id")
-    suspend fun markAsRead(id: Int)
+    suspend fun markAsRead(id: String)
 
     @Query("DELETE FROM notifications WHERE id = :id")
-    suspend fun deleteNotificationById(id: Int)
+    suspend fun deleteNotificationById(id: String)
 
     @Query("DELETE FROM notifications WHERE userId = :userId")
     suspend fun deleteAllNotifications(userId: String)

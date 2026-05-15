@@ -4,7 +4,8 @@ data class UserDto(
     val id: String = "",
     val name: String = "",
     val email: String = "",
-    val role: String = "" // student, teacher, admin
+    val role: String = "", // student, teacher, admin
+    val status: String = "pending"
 )
 
 data class DepartmentDto(
@@ -16,21 +17,24 @@ data class CourseDto(
     val id: String = "",
     val name: String = "",
     val departmentId: String = "",
-    val year: String = ""
+    val year: String = "",
+    val semester: String = ""
 )
 
 data class SectionDto(
     val sectionId: String = "",
     val courseId: String = "",
     val name: String = "",
-    val year: String = ""
+    val year: String = "",
+    val semester: String = ""
 )
 
 data class StudentDto(
     val studentId: String = "",
     val userId: String = "",
     val departmentId: String? = null,
-    val year: String = ""
+    val year: String = "",
+    val semester: String = ""
 )
 
 data class TeacherDto(
@@ -46,6 +50,7 @@ data class ScheduleDto(
     val teacherId: String = "",
     val departmentId: String = "",
     val year: String = "",
+    val semester: String = "",
     val dayOfWeek: String = "",
     val startTime: String = "",
     val endTime: String = ""
@@ -56,7 +61,9 @@ data class SessionDto(
     val scheduleId: String = "",
     val qrCode: String = "",
     val date: Long = 0L,
-    val isActive: Boolean = true
+    val isActive: Boolean = true,
+    val durationMinutes: Int = 15,
+    val maxStudents: Int = 0
 )
 
 data class AttendanceDto(
@@ -69,7 +76,8 @@ data class AttendanceDto(
 
 data class NotificationDto(
     val id: String = "",
-    val studentId: String = "",
+    val userId: String = "",
+    val title: String = "",
     val message: String = "",
     val type: String = "",
     val isRead: Boolean = false,

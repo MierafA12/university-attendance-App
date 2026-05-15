@@ -177,7 +177,7 @@ fun WeeklyHistoryItem(weekKey: String, records: List<AttendanceRecord>, schoolCo
                 ) {
                     Text(text = weekLabel, fontWeight = FontWeight.SemiBold, fontSize = 14.sp, color = Color.DarkGray)
                     
-                    val presentCount = records.count { it.status == AttendanceStatus.Present || it.status == AttendanceStatus.Late }
+                    val presentCount = records.count { it.status == AttendanceStatus.Present }
                     Text(
                         text = "$presentCount/${records.size} Sessions",
                         fontSize = 12.sp,
@@ -200,7 +200,7 @@ fun WeeklyHistoryItem(weekKey: String, records: List<AttendanceRecord>, schoolCo
                     
                     val statusColor = when (record.status) {
                         AttendanceStatus.Present -> schoolColor
-                        AttendanceStatus.Late -> Color(0xFFFBC02D)
+                        AttendanceStatus.Permission -> Color(0xFF1976D2)
                         else -> Color.Red
                     }
                     

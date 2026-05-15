@@ -12,7 +12,7 @@ import kotlinx.coroutines.flow.Flow
 @Dao
 interface AttendanceDao {
 
-    @Insert(onConflict = OnConflictStrategy.ABORT) // Abort if duplicate (unique index on sessionId+studentId)
+    @Insert(onConflict = OnConflictStrategy.REPLACE) 
     suspend fun insertAttendance(attendance: AttendanceEntity): Long
 
     @Update
@@ -23,6 +23,9 @@ interface AttendanceDao {
 
     @Query("SELECT * FROM attendance_records WHERE id = :id")
     fun getAttendanceById(id: String): Flow<AttendanceEntity?>
+
+    @Query("SELECT * FROM attendance_records")
+    fun getAllAttendanceRecords(): Flow<List<AttendanceEntity>>
 
     /** All attendance records for a specific session */
     @Query("SELECT * FROM attendance_records WHERE sessionId = :sessionId")

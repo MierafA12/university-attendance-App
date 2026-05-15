@@ -17,22 +17,35 @@ class App : Application() {
     }
 
     val userRepository: UserRepository by lazy {
-        UserRepositoryImpl(database.userDao())
+        UserRepositoryImpl(database.userDao(), database.studentDao(), database.teacherDao())
     }
 
     val attendanceRepository: AttendanceRepository by lazy {
         AttendanceRepositoryImpl(database.attendanceDao(), database.sessionDao())
     }
 
+    val notificationRepository: com.attendance.attendanceapp.domain.repository.NotificationRepository by lazy {
+        com.attendance.attendanceapp.data.repository.NotificationRepositoryImpl(database.notificationDao())
+    }
+
+    val academicRepository: com.attendance.attendanceapp.domain.repository.AcademicRepository by lazy {
+        com.attendance.attendanceapp.data.repository.AcademicRepositoryImpl(
+            database.departmentDao(),
+            database.courseDao(),
+            database.sectionDao(),
+            database.scheduleDao()
+        )
+    }
+
     override fun onCreate() {
         super.onCreate()
-
-        // Initialize Firebase (idempotent — safe to call multiple times)
-        FirebaseApp.initializeApp(this)
-
-        // Warm up the FirebaseManager lazy instances so Firestore settings
-        // (offline persistence) are applied before the first query
-        FirebaseManager.firestore
-        FirebaseManager.auth
+        // Initialize Firebase first
+        try {
+            if (com.google.firebase.FirebaseApp.getApps(this).isEmpty()) {
+                com.google.firebase.FirebaseApp.initializeApp(this)
+            }
+        } catch (e: Exception) {
+            android.util.Log.e("App", "Firebase initialization failed", e)
+        }
     }
 }

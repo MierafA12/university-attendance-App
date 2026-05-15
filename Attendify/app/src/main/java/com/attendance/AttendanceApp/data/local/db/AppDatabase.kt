@@ -38,7 +38,7 @@ import com.attendance.attendanceapp.data.local.entity.UserEntity
         AttendanceEntity::class,
         NotificationEntity::class
     ],
-    version = 1,
+    version = 10,
     exportSchema = false
 )
 abstract class AppDatabase : RoomDatabase() {
@@ -67,7 +67,8 @@ abstract class AppDatabase : RoomDatabase() {
                     AppDatabase::class.java,
                     DATABASE_NAME
                 )
-                    .fallbackToDestructiveMigration() // Replace with proper migrations before production
+                    .fallbackToDestructiveMigration()
+                    .fallbackToDestructiveMigrationOnDowngrade() // Handle version downgrades
                     .build()
                     .also { INSTANCE = it }
             }

@@ -17,6 +17,8 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -27,9 +29,14 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.layout.ContentScale
+import android.graphics.BitmapFactory
 
 @Composable
 fun LoginScreen(
+    viewModel: AuthViewModel,
     onLoginSuccess: (String) -> Unit, // Changed to pass role
     onNavigateToRegister: () -> Unit,
     onNavigateToForgot: () -> Unit
@@ -38,6 +45,17 @@ fun LoginScreen(
     var password by remember { mutableStateOf("") }
     var passwordVisible by remember { mutableStateOf(false) }
     var rememberMe by remember { mutableStateOf(false) }
+
+    val authState by viewModel.authState
+    val context = LocalContext.current
+
+    LaunchedEffect(authState) {
+        if (authState is AuthState.Authenticated) {
+            val user = (authState as AuthState.Authenticated).user
+            onLoginSuccess(user.role.name)
+            viewModel.resetState()
+        }
+    }
 
     Column(
         modifier = Modifier
@@ -62,28 +80,47 @@ fun LoginScreen(
             Column(
                 modifier = Modifier
                     .fillMaxSize()
-                    .padding(24.dp),
+                    .padding(24.dp)
+                    .verticalScroll(rememberScrollState()),
                 horizontalAlignment = Alignment.Start
             ) {
-                // Logo removed as requested
-                Spacer(modifier = Modifier.height(8.dp))
+                val logoBitmap = remember {
+                    try {
+                        context.assets.open("Attendify logo.png").use { inputStream ->
+                            BitmapFactory.decodeStream(inputStream)
+                        }
+                    } catch (e: Exception) {
+                        null
+                    }
+                }
 
-                Spacer(modifier = Modifier.height(24.dp))
+                if (logoBitmap != null) {
+                    Image(
+                        bitmap = logoBitmap.asImageBitmap(),
+                        contentDescription = "Attendify Logo",
+                        modifier = Modifier
+                            .size(80.dp)
+                            .align(Alignment.CenterHorizontally),
+                        contentScale = ContentScale.Fit
+                    )
+                }
+                
+                Spacer(modifier = Modifier.height(12.dp))
 
                 Text(
                     text = "Login",
-                    fontSize = 32.sp,
+                    fontSize = 28.sp,
                     fontWeight = FontWeight.Bold,
                     color = Color.Black
                 )
                 Text(
                     text = "Please login to your account",
-                    fontSize = 16.sp,
+                    fontSize = 14.sp,
                     color = Color.Gray,
-                    modifier = Modifier.padding(top = 4.dp)
+                    modifier = Modifier.padding(top = 2.dp)
                 )
 
-                Spacer(modifier = Modifier.height(32.dp))
+                Spacer(modifier = Modifier.height(24.dp))
 
                 // Email Field
                 AuthTextField(
@@ -132,24 +169,34 @@ fun LoginScreen(
                     )
                 }
 
+                if (authState is AuthState.Error) {
+                    Text(
+                        text = (authState as AuthState.Error).message,
+                        color = MaterialTheme.colorScheme.error,
+                        modifier = Modifier.padding(top = 8.dp)
+                    )
+                }
+
                 Spacer(modifier = Modifier.height(32.dp))
 
                 Button(
                     onClick = {
-                        val role = when (email.lowercase()) {
-                            "admin1@gmail.com" -> "admin"
-                            "teacher1@gmail.com" -> "teacher"
-                            else -> "student"
+                        if (email.isNotBlank() && password.isNotBlank()) {
+                            viewModel.login(email.trim(), password.trim())
                         }
-                        onLoginSuccess(role)
                     },
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(56.dp),
+                    enabled = authState !is AuthState.Loading,
                     colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF006064)), // School brand color
                     shape = RoundedCornerShape(16.dp)
                 ) {
-                    Text("Login", fontSize = 18.sp, fontWeight = FontWeight.Bold)
+                    if (authState is AuthState.Loading) {
+                        CircularProgressIndicator(color = Color.White, modifier = Modifier.size(24.dp))
+                    } else {
+                        Text("Login", fontSize = 18.sp, fontWeight = FontWeight.Bold)
+                    }
                 }
 
                 Row(

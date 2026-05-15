@@ -21,14 +21,17 @@ interface ScheduleDao {
     suspend fun deleteSchedule(schedule: ScheduleEntity)
 
     @Query("SELECT * FROM schedules WHERE scheduleId = :scheduleId")
-    fun getScheduleById(scheduleId: Int): Flow<ScheduleEntity?>
+    fun getScheduleById(scheduleId: String): Flow<ScheduleEntity?>
+
+    @Query("SELECT * FROM schedules")
+    fun getAllSchedules(): Flow<List<ScheduleEntity>>
 
     @Query("SELECT * FROM schedules WHERE courseId = :courseId")
-    fun getSchedulesByCourse(courseId: Int): Flow<List<ScheduleEntity>>
+    fun getSchedulesByCourse(courseId: String): Flow<List<ScheduleEntity>>
 
     @Query("SELECT * FROM schedules WHERE teacherId = :teacherId")
-    fun getSchedulesByTeacher(teacherId: Int): Flow<List<ScheduleEntity>>
+    fun getSchedulesByTeacher(teacherId: String): Flow<List<ScheduleEntity>>
 
     @Query("DELETE FROM schedules WHERE scheduleId = :scheduleId")
-    suspend fun deleteScheduleById(scheduleId: Int)
+    suspend fun deleteScheduleById(scheduleId: String)
 }

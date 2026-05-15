@@ -4,11 +4,7 @@ import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.attendance.attendanceapp.domain.model.Course
-import com.attendance.attendanceapp.domain.model.Department
-import com.attendance.attendanceapp.domain.model.Schedule
-import com.attendance.attendanceapp.domain.model.User
-import com.attendance.attendanceapp.domain.model.Role
+import com.attendance.attendanceapp.domain.model.*
 import com.attendance.attendanceapp.domain.repository.AcademicRepository
 import com.attendance.attendanceapp.domain.repository.UserRepository
 import kotlinx.coroutines.flow.*
@@ -44,8 +40,85 @@ class AdminViewModel(
     val allSchedules: StateFlow<List<Schedule>> = academicRepository.getAllSchedules()
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
 
-    val allSessions: StateFlow<List<com.attendance.attendanceapp.domain.model.Session>> = attendanceRepository.getAllSessions()
+    val allSessions: StateFlow<List<Session>> = attendanceRepository.getAllSessions()
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
+
+    val allAttendance: StateFlow<List<Attendance>> = attendanceRepository.getAllAttendance()
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
+
+    private val _selectedCourseId = MutableStateFlow("")
+    val selectedCourseId: StateFlow<String> = _selectedCourseId.asStateFlow()
+
+    fun setCourseFilter(courseId: String) {
+        _selectedCourseId.value = courseId
+    }
+
+    val studentReports: StateFlow<List<StudentReportItem>> = combine(
+        userRepository.getUsersByRole(Role.student),
+        userRepository.getAllStudentProfiles(),
+        allSessions,
+        allAttendance,
+        combine(allSchedules, _selectedCourseId, departments) { s, c, d -> Triple(s, c, d) }
+    ) { users, studentProfiles, sessions, attendances, filterTriple ->
+        val (schedules, courseFilter, deptList) = filterTriple
+        users.mapNotNull { user ->
+            val profile = studentProfiles.find { it.userId == user.id } ?: return@mapNotNull null
+            
+            val studentYear = profile.year.filter { it.isDigit() }
+            val studentSem = profile.semester.filter { it.isDigit() }
+            val studentDeptId = profile.departmentId?.trim() ?: ""
+
+            val relevantSessions = sessions.filter { session ->
+                val schedule = schedules.find { it.scheduleId == session.scheduleId } ?: return@filter false
+                val matchesCourse = courseFilter.isEmpty() || schedule.courseId == courseFilter
+                
+                // 1. Normalize strings for flexible matching (e.g. "4" matches "Year 4")
+                val scheduleYear = schedule.year.filter { it.isDigit() }
+                val scheduleSem = schedule.semester.filter { it.isDigit() }
+                val scheduleDeptId = schedule.departmentId.trim()
+
+                val yearMatch = studentYear == scheduleYear || profile.year.trim().equals(schedule.year.trim(), ignoreCase = true)
+                val semMatch = studentSem == scheduleSem || profile.semester.trim().equals(schedule.semester.trim(), ignoreCase = true)
+                
+                // 2. Robust Department Matching (ID or Name)
+                val deptMatch = if (studentDeptId.isEmpty()) false 
+                else {
+                    scheduleDeptId.equals(studentDeptId, ignoreCase = true) || 
+                    deptList.find { it.id == scheduleDeptId }?.name?.equals(studentDeptId, ignoreCase = true) == true ||
+                    deptList.find { it.id == studentDeptId }?.name?.equals(scheduleDeptId, ignoreCase = true) == true
+                }
+
+                yearMatch && semMatch && deptMatch && matchesCourse
+            }
+            
+            val totalSessions = relevantSessions.size
+            // If filtering by course, only show students who have at least one session in that course
+            if (courseFilter.isNotEmpty() && totalSessions == 0) return@mapNotNull null
+            
+            val relevantSessionIds = relevantSessions.map { it.id }.toSet()
+            
+            // Check for both Firebase UID and Student ID to handle legacy or mixed records
+            val studentIds = setOfNotNull(user.id, profile.studentId)
+            val presentCount = attendances.count { it.studentId in studentIds && it.sessionId in relevantSessionIds }
+            
+            val percentage = if (totalSessions > 0) {
+                (presentCount.toFloat() / totalSessions.toFloat()) * 100f
+            } else {
+                0f
+            }
+
+            StudentReportItem(
+                studentId = user.id,
+                name = user.name,
+                departmentId = profile.departmentId ?: "",
+                semester = profile.semester,
+                year = profile.year,
+                attendancePercentage = percentage,
+                presentCount = presentCount,
+                totalSessions = totalSessions
+            )
+        }
+    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
 
     fun createSchedule(
         courseId: String,
@@ -102,7 +175,7 @@ class AdminViewModel(
     fun approveUser(user: User) {
         viewModelScope.launch(kotlinx.coroutines.Dispatchers.IO) {
             try {
-                userRepository.updateUser(user.copy(status = com.attendance.attendanceapp.domain.model.UserStatus.active))
+                userRepository.updateUser(user.copy(status = UserStatus.active))
                 _uiState.value = AdminUiState.Success("${user.name} approved")
             } catch (e: Exception) {
                 _uiState.value = AdminUiState.Error(e.message ?: "Failed to approve user")
@@ -121,7 +194,7 @@ class AdminViewModel(
         }
     }
 
-    fun updateUserStatus(user: User, status: com.attendance.attendanceapp.domain.model.UserStatus) {
+    fun updateUserStatus(user: User, status: UserStatus) {
         viewModelScope.launch(kotlinx.coroutines.Dispatchers.IO) {
             try {
                 userRepository.updateUser(user.copy(status = status))
@@ -165,18 +238,18 @@ class AdminViewModel(
         }
     }
 
-    fun getStudentDetails(userId: String): Flow<com.attendance.attendanceapp.domain.model.Student?> {
+    fun getStudentDetails(userId: String): Flow<Student?> {
         return userRepository.getStudentByUserId(userId)
     }
 
-    fun getTeacherDetails(userId: String): Flow<com.attendance.attendanceapp.domain.model.Teacher?> {
+    fun getTeacherDetails(userId: String): Flow<Teacher?> {
         return userRepository.getTeacherByUserId(userId)
     }
 
     fun updateUserDetails(
         user: User, 
-        student: com.attendance.attendanceapp.domain.model.Student? = null,
-        teacher: com.attendance.attendanceapp.domain.model.Teacher? = null
+        student: Student? = null,
+        teacher: Teacher? = null
     ) {
         _uiState.value = AdminUiState.Loading
         viewModelScope.launch(kotlinx.coroutines.Dispatchers.IO) {
@@ -201,27 +274,33 @@ class AdminViewModel(
 
     private fun checkPendingApprovals() {
         viewModelScope.launch {
-            combine(teachers, students) { t, s -> t + s }.collect { allUsers ->
-                val pendingCount = allUsers.count { it.status == com.attendance.attendanceapp.domain.model.UserStatus.pending }
-                if (pendingCount > 0) {
+            try {
+                combine(teachers, students) { t, s -> t + s }.collectLatest { allUsers ->
+                    val pendingCount = allUsers.count { it.status == com.attendance.attendanceapp.domain.model.UserStatus.pending }
                     val currentAdminId = com.google.firebase.auth.FirebaseAuth.getInstance().currentUser?.uid ?: ""
-                    val existing = notificationRepository.getNotificationsByUser(currentAdminId).first()
-                    val alreadyNotified = existing.any { it.title == "Pending Approvals" }
                     
-                    if (!alreadyNotified) {
-                        notificationRepository.insertNotification(
-                            com.attendance.attendanceapp.domain.model.Notification(
-                                id = "",
-                                userId = currentAdminId,
-                                title = "Pending Approvals",
-                                message = "There are $pendingCount new users waiting for your approval.",
-                                type = "warning",
-                                isRead = false,
-                                createdAt = System.currentTimeMillis()
+                    if (pendingCount > 0 && currentAdminId.isNotEmpty()) {
+                        val notificationId = "PENDING_APPROVALS_${currentAdminId}"
+                        val existing = notificationRepository.getNotificationsByUser(currentAdminId).first()
+                        val alreadyNotified = existing.any { it.id == notificationId || it.title == "Pending Approvals" }
+                        
+                        if (!alreadyNotified) {
+                            notificationRepository.insertNotification(
+                                Notification(
+                                    id = notificationId,
+                                    userId = currentAdminId,
+                                    title = "Pending Approvals",
+                                    message = "There are $pendingCount new users waiting for your approval.",
+                                    type = "warning",
+                                    isRead = false,
+                                    createdAt = System.currentTimeMillis()
+                                )
                             )
-                        )
+                        }
                     }
                 }
+            } catch (e: Exception) {
+                android.util.Log.e("AdminVM", "Error in checkPendingApprovals", e)
             }
         }
     }

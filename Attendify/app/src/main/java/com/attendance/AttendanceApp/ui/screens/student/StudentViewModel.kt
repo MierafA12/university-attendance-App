@@ -182,7 +182,7 @@ class StudentViewModel(
                 // Attendance for these sessions
                 val presentCount = history.count { record -> 
                     courseSessions.any { it.id == record.sessionId } && 
-                    (record.status == AttendanceStatus.Present || record.status == AttendanceStatus.Late)
+                    record.status == AttendanceStatus.Present
                 }
                 
                 val absences = (totalSessions - presentCount).coerceAtLeast(0)
@@ -322,11 +322,12 @@ class StudentViewModel(
                     val existing = notificationRepository.getNotificationsByUser(currentUserId).first()
                     reports.forEach { report ->
                         if (report.absences >= 3) {
-                            val alreadyNotified = existing.any { it.title == "Attendance Warning" && it.message.contains(report.courseName) }
+                            val notificationId = "ATTENDANCE_WARN_${report.courseId}_${currentUserId}"
+                            val alreadyNotified = existing.any { it.id == notificationId || (it.title == "Attendance Warning" && it.message.contains(report.courseName)) }
                             if (!alreadyNotified) {
                                 notificationRepository.insertNotification(
                                     Notification(
-                                        id = "",
+                                        id = notificationId,
                                         userId = currentUserId,
                                         title = "Attendance Warning",
                                         message = "You have ${report.absences} absences in ${report.courseName}. Please attend classes to avoid penalties.",

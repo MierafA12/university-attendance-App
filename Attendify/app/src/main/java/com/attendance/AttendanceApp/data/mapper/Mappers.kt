@@ -6,47 +6,51 @@ import com.attendance.attendanceapp.domain.model.*
 
 // --- User Mappers ---
 fun UserEntity.toDomain(): User = User(
-    id = id.toString(),
+    id = id,
     name = name,
     email = email,
-    role = Role.valueOf(role)
+    role = try { Role.valueOf(role.lowercase()) } catch(e: Exception) { Role.student },
+    status = try { UserStatus.valueOf(status.lowercase()) } catch(e: Exception) { UserStatus.pending }
 )
 
 fun User.toEntity(): UserEntity = UserEntity(
-    id = id.toIntOrNull() ?: 0,
+    id = id,
     name = name,
     email = email,
     password = "", // Managed via Auth
-    role = role.name
+    role = role.name,
+    status = status.name
 )
 
 fun UserDto.toDomain(): User = User(
     id = id,
     name = name,
     email = email,
-    role = if (role.isNotEmpty()) Role.valueOf(role) else Role.student
+    role = try { Role.valueOf(role.lowercase()) } catch(e: Exception) { Role.student },
+    status = try { UserStatus.valueOf(status.lowercase()) } catch(e: Exception) { UserStatus.pending }
 )
 
 fun User.toDto(): UserDto = UserDto(
     id = id,
     name = name,
     email = email,
-    role = role.name
+    role = role.name,
+    status = status.name
 )
 
 // --- Attendance Mappers ---
 fun AttendanceEntity.toDomain(): Attendance = Attendance(
-    id = id.toString(),
-    studentId = studentId.toString(),
-    sessionId = sessionId.toString(),
+    id = id,
+    studentId = studentId,
+    sessionId = sessionId,
     timestamp = timestamp,
-    status = AttendanceStatus.valueOf(status)
+    status = try { AttendanceStatus.valueOf(status) } catch(e: Exception) { AttendanceStatus.Absent }
 )
 
 fun Attendance.toEntity(): AttendanceEntity = AttendanceEntity(
-    id = id.toIntOrNull() ?: 0,
-    studentId = studentId.toIntOrNull() ?: 0,
-    sessionId = sessionId.toIntOrNull() ?: 0,
+    id = id,
+    studentId = studentId,
+    sessionId = sessionId,
     status = status.name,
     timestamp = timestamp
 )
@@ -55,7 +59,7 @@ fun AttendanceDto.toDomain(): Attendance = Attendance(
     id = id,
     studentId = studentId,
     sessionId = sessionId,
-    status = if (status.isNotEmpty()) AttendanceStatus.valueOf(status) else AttendanceStatus.Absent,
+    status = try { AttendanceStatus.valueOf(status) } catch(e: Exception) { AttendanceStatus.Absent },
     timestamp = timestamp
 )
 
@@ -73,15 +77,19 @@ fun SessionEntity.toDomain(): Session = Session(
     scheduleId = scheduleId.toString(),
     qrCode = qrCode,
     date = date,
-    isActive = isActive
+    isActive = isActive,
+    durationMinutes = durationMinutes,
+    maxStudents = maxStudents
 )
 
 fun Session.toEntity(): SessionEntity = SessionEntity(
-    sessionId = id.toIntOrNull() ?: 0,
-    scheduleId = scheduleId.toIntOrNull() ?: 0,
+    sessionId = id,
+    scheduleId = scheduleId,
     qrCode = qrCode,
     date = date,
-    isActive = isActive
+    isActive = isActive,
+    durationMinutes = durationMinutes,
+    maxStudents = maxStudents
 )
 
 fun SessionDto.toDomain(): Session = Session(
@@ -89,7 +97,9 @@ fun SessionDto.toDomain(): Session = Session(
     scheduleId = scheduleId,
     qrCode = qrCode,
     date = date,
-    isActive = isActive
+    isActive = isActive,
+    durationMinutes = durationMinutes,
+    maxStudents = maxStudents
 )
 
 fun Session.toDto(): SessionDto = SessionDto(
@@ -97,46 +107,52 @@ fun Session.toDto(): SessionDto = SessionDto(
     scheduleId = scheduleId,
     qrCode = qrCode,
     date = date,
-    isActive = isActive
+    isActive = isActive,
+    durationMinutes = durationMinutes,
+    maxStudents = maxStudents
 )
 
 // --- Course Mappers ---
 fun CourseEntity.toDomain(): Course = Course(
-    id = courseId.toString(),
+    id = courseId,
     name = name,
-    departmentId = departmentId.toString(),
-    year = year
+    departmentId = departmentId,
+    year = year,
+    semester = semester
 )
 
 fun Course.toEntity(): CourseEntity = CourseEntity(
-    courseId = id.toIntOrNull() ?: 0,
+    courseId = id,
     name = name,
-    departmentId = departmentId.toIntOrNull() ?: 0,
-    year = year
+    departmentId = departmentId,
+    year = year,
+    semester = semester
 )
 
 fun CourseDto.toDomain(): Course = Course(
     id = id,
     name = name,
     departmentId = departmentId,
-    year = year
+    year = year,
+    semester = semester
 )
 
 fun Course.toDto(): CourseDto = CourseDto(
     id = id,
     name = name,
     departmentId = departmentId,
-    year = year
+    year = year,
+    semester = semester
 )
 
 // --- Department Mappers ---
 fun DepartmentEntity.toDomain(): Department = Department(
-    id = id.toString(),
+    id = id,
     name = name
 )
 
 fun Department.toEntity(): DepartmentEntity = DepartmentEntity(
-    id = id.toIntOrNull() ?: 0,
+    id = id,
     name = name
 )
 
@@ -152,31 +168,35 @@ fun Department.toDto(): DepartmentDto = DepartmentDto(
 
 // --- Student Mappers ---
 fun StudentEntity.toDomain(): Student = Student(
-    studentId = studentId.toString(),
-    userId = userId.toString(),
-    departmentId = departmentId?.toString(),
-    year = year
+    studentId = studentId,
+    userId = userId,
+    departmentId = departmentId,
+    year = year,
+    semester = semester
 )
 
 fun Student.toEntity(): StudentEntity = StudentEntity(
-    studentId = studentId.toIntOrNull() ?: 0,
-    userId = userId.toIntOrNull() ?: 0,
-    departmentId = departmentId?.toIntOrNull(),
-    year = year
+    studentId = studentId,
+    userId = userId,
+    departmentId = departmentId,
+    year = year,
+    semester = semester
 )
 
 fun StudentDto.toDomain(): Student = Student(
     studentId = studentId,
     userId = userId,
     departmentId = departmentId,
-    year = year
+    year = year,
+    semester = semester
 )
 
 fun Student.toDto(): StudentDto = StudentDto(
     studentId = studentId,
     userId = userId,
     departmentId = departmentId,
-    year = year
+    year = year,
+    semester = semester
 )
 
 // --- Teacher Mappers ---
@@ -188,9 +208,9 @@ fun TeacherEntity.toDomain(): Teacher = Teacher(
 )
 
 fun Teacher.toEntity(): TeacherEntity = TeacherEntity(
-    teacherId = teacherId.toIntOrNull() ?: 0,
-    userId = userId.toIntOrNull() ?: 0,
-    departmentId = departmentId?.toIntOrNull(),
+    teacherId = teacherId,
+    userId = userId,
+    departmentId = departmentId,
     specialization = specialization
 )
 
@@ -210,22 +230,24 @@ fun Teacher.toDto(): TeacherDto = TeacherDto(
 
 // --- Schedule Mappers ---
 fun ScheduleEntity.toDomain(): Schedule = Schedule(
-    scheduleId = scheduleId.toString(),
-    courseId = courseId.toString(),
-    teacherId = teacherId.toString(),
-    departmentId = departmentId.toString(),
+    scheduleId = scheduleId,
+    courseId = courseId,
+    teacherId = teacherId,
+    departmentId = departmentId,
     year = year,
+    semester = semester,
     dayOfWeek = dayOfWeek,
     startTime = startTime,
     endTime = endTime
 )
 
 fun Schedule.toEntity(): ScheduleEntity = ScheduleEntity(
-    scheduleId = scheduleId.toIntOrNull() ?: 0,
-    courseId = courseId.toIntOrNull() ?: 0,
-    teacherId = teacherId.toIntOrNull() ?: 0,
-    departmentId = departmentId.toIntOrNull() ?: 0,
+    scheduleId = scheduleId,
+    courseId = courseId,
+    teacherId = teacherId,
+    departmentId = departmentId,
     year = year,
+    semester = semester,
     dayOfWeek = dayOfWeek,
     startTime = startTime,
     endTime = endTime
@@ -237,6 +259,7 @@ fun ScheduleDto.toDomain(): Schedule = Schedule(
     teacherId = teacherId,
     departmentId = departmentId,
     year = year,
+    semester = semester,
     dayOfWeek = dayOfWeek,
     startTime = startTime,
     endTime = endTime
@@ -248,15 +271,18 @@ fun Schedule.toDto(): ScheduleDto = ScheduleDto(
     teacherId = teacherId,
     departmentId = departmentId,
     year = year,
+    semester = semester,
     dayOfWeek = dayOfWeek,
     startTime = startTime,
     endTime = endTime
 )
 
 // --- Notification Mappers ---
+
 fun NotificationEntity.toDomain(): Notification = Notification(
     id = id.toString(),
-    studentId = studentId.toString(),
+    userId = userId,
+    title = title,
     message = message,
     type = type,
     isRead = isRead,
@@ -264,8 +290,9 @@ fun NotificationEntity.toDomain(): Notification = Notification(
 )
 
 fun Notification.toEntity(): NotificationEntity = NotificationEntity(
-    id = id.toIntOrNull() ?: 0,
-    studentId = studentId.toIntOrNull() ?: 0,
+    id = id,
+    userId = userId,
+    title = title,
     message = message,
     type = type,
     isRead = isRead,
@@ -274,7 +301,8 @@ fun Notification.toEntity(): NotificationEntity = NotificationEntity(
 
 fun NotificationDto.toDomain(): Notification = Notification(
     id = id,
-    studentId = studentId,
+    userId = userId,
+    title = title,
     message = message,
     type = type,
     isRead = isRead,
@@ -283,7 +311,8 @@ fun NotificationDto.toDomain(): Notification = Notification(
 
 fun Notification.toDto(): NotificationDto = NotificationDto(
     id = id,
-    studentId = studentId,
+    userId = userId,
+    title = title,
     message = message,
     type = type,
     isRead = isRead,
@@ -291,29 +320,33 @@ fun Notification.toDto(): NotificationDto = NotificationDto(
 )
 // --- Section Mappers ---
 fun SectionEntity.toDomain(): Section = Section(
-    id = sectionId.toString(),
-    courseId = courseId.toString(),
+    id = sectionId,
+    courseId = courseId,
     name = name,
-    year = year
+    year = year,
+    semester = semester
 )
 
 fun Section.toEntity(): SectionEntity = SectionEntity(
-    sectionId = id.toIntOrNull() ?: 0,
-    courseId = courseId.toIntOrNull() ?: 0,
+    sectionId = id,
+    courseId = courseId,
     name = name,
-    year = year
+    year = year,
+    semester = semester
 )
 
 fun SectionDto.toDomain(): Section = Section(
     id = sectionId,
     courseId = courseId,
     name = name,
-    year = year
+    year = year,
+    semester = semester
 )
 
 fun Section.toDto(): SectionDto = SectionDto(
     sectionId = id,
     courseId = courseId,
     name = name,
-    year = year
+    year = year,
+    semester = semester
 )

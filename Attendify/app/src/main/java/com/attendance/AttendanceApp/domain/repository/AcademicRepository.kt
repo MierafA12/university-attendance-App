@@ -27,6 +27,7 @@ interface AcademicRepository {
     suspend fun deleteSection(id: String)
     
     // Schedules
+    fun getAllSchedules(): Flow<List<Schedule>>
     fun getSchedulesByCourse(courseId: String): Flow<List<Schedule>>
     fun getSchedulesByTeacher(teacherId: String): Flow<List<Schedule>>
     fun getScheduleById(id: String): Flow<Schedule?>

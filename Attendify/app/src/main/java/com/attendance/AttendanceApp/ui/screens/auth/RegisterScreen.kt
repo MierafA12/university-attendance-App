@@ -1,5 +1,6 @@
 package com.attendance.attendanceapp.ui.screens.auth
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -19,10 +20,15 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.layout.ContentScale
+import android.graphics.BitmapFactory
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun RegisterScreen(
+    viewModel: AuthViewModel,
     onRegisterSuccess: () -> Unit,
     onNavigateToLogin: () -> Unit
 ) {
@@ -36,20 +42,27 @@ fun RegisterScreen(
     var selectedYear by remember { mutableStateOf("") }
     var selectedDept by remember { mutableStateOf("") }
     var selectedSection by remember { mutableStateOf("") }
+    var selectedSemester by remember { mutableStateOf("") }
 
     var yearExpanded by remember { mutableStateOf(false) }
     var deptExpanded by remember { mutableStateOf(false) }
     var sectionExpanded by remember { mutableStateOf(false) }
+    var semesterExpanded by remember { mutableStateOf(false) }
 
-    // Mock Data
-    val years = listOf("Freshman (Year 1)", "Year 2", "Year 3", "Year 4", "Year 5")
-    val departmentsMap = mapOf(
-        "Freshman (Year 1)" to listOf("Engineering", "Social Sciences", "Medicine"),
-        "Year 2" to listOf("Software Engineering", "Mechanical", "Electrical", "Civil"),
-        "Year 3" to listOf("Software Engineering", "Mechanical", "Electrical", "Civil"),
-        "Year 4" to listOf("Software Engineering", "Mechanical", "Electrical", "Civil"),
-        "Year 5" to listOf("Software Engineering", "Mechanical", "Electrical", "Civil")
-    )
+    val authState by viewModel.authState
+    val context = LocalContext.current
+
+    LaunchedEffect(authState) {
+        if (authState is AuthState.Authenticated) {
+            onRegisterSuccess()
+            viewModel.resetState()
+        }
+    }
+
+    val departments by viewModel.departments.collectAsState()
+    val departmentsList = departments.map { it.name }
+    
+    // Mock Section Data (Could be fetched from repo too)
     val sectionsMap = mapOf(
         "Software Engineering" to listOf("Section 1", "Section 2", "Section 3"),
         "Civil" to listOf("Section A", "Section B"),
@@ -85,22 +98,40 @@ fun RegisterScreen(
                     .verticalScroll(scrollState),
                 horizontalAlignment = Alignment.Start
             ) {
-                // Logo removed
-                Spacer(modifier = Modifier.height(8.dp))
+                val logoBitmap = remember {
+                    try {
+                        context.assets.open("Attendify logo.png").use { inputStream ->
+                            BitmapFactory.decodeStream(inputStream)
+                        }
+                    } catch (e: Exception) {
+                        null
+                    }
+                }
 
-                Spacer(modifier = Modifier.height(24.dp))
+                if (logoBitmap != null) {
+                    Image(
+                        bitmap = logoBitmap.asImageBitmap(),
+                        contentDescription = "Attendify Logo",
+                        modifier = Modifier
+                            .size(60.dp)
+                            .align(Alignment.CenterHorizontally),
+                        contentScale = ContentScale.Fit
+                    )
+                }
+
+                Spacer(modifier = Modifier.height(12.dp))
 
                 Text(
                     text = "Sign up",
-                    fontSize = 32.sp,
+                    fontSize = 28.sp,
                     fontWeight = FontWeight.Bold,
                     color = Color.Black
                 )
                 Text(
                     text = "Let's keep it quick, just a few steps and you're in",
-                    fontSize = 16.sp,
+                    fontSize = 14.sp,
                     color = Color.Gray,
-                    modifier = Modifier.padding(top = 4.dp)
+                    modifier = Modifier.padding(top = 2.dp)
                 )
 
                 Spacer(modifier = Modifier.height(32.dp))
@@ -169,38 +200,33 @@ fun RegisterScreen(
                     selectedOption = selectedYear,
                     expanded = yearExpanded,
                     onExpandedChange = { yearExpanded = it },
-                    options = years,
+                    options = listOf("1", "2", "3", "4", "5"),
                     onOptionSelected = {
                         selectedYear = it
-                        selectedDept = "" // Reset Dept
-                        selectedSection = "" // Reset Section
                     },
                     leadingIcon = Icons.Outlined.CalendarToday
                 )
 
-                if (selectedYear.isNotEmpty()) {
-                    Spacer(modifier = Modifier.height(16.dp))
-                    // Dept Dropdown
-                    val depts = departmentsMap[selectedYear] ?: emptyList()
-                    AuthDropdownField(
-                        label = "Department",
-                        selectedOption = selectedDept,
-                        expanded = deptExpanded,
-                        onExpandedChange = { deptExpanded = it },
-                        options = depts,
-                        onOptionSelected = {
-                            selectedDept = it
-                            selectedSection = "" // Reset Section
-                        },
-                        leadingIcon = Icons.Outlined.School
-                    )
-                }
+                Spacer(modifier = Modifier.height(16.dp))
+
+                // Dept Dropdown
+                AuthDropdownField(
+                    label = "Department",
+                    selectedOption = selectedDept,
+                    expanded = deptExpanded,
+                    onExpandedChange = { deptExpanded = it },
+                    options = departmentsList,
+                    onOptionSelected = {
+                        selectedDept = it
+                        selectedSection = "" // Reset Section
+                    },
+                    leadingIcon = Icons.Outlined.School
+                )
 
                 if (selectedDept.isNotEmpty()) {
                     val sections = sectionsMap[selectedDept] ?: emptyList()
                     if (sections.isNotEmpty()) {
                         Spacer(modifier = Modifier.height(16.dp))
-                        // Section Dropdown
                         AuthDropdownField(
                             label = "Section",
                             selectedOption = selectedSection,
@@ -213,17 +239,59 @@ fun RegisterScreen(
                     }
                 }
 
+                Spacer(modifier = Modifier.height(16.dp))
+                
+                // Semester Dropdown
+                AuthDropdownField(
+                    label = "Semester",
+                    selectedOption = selectedSemester,
+                    expanded = semesterExpanded,
+                    onExpandedChange = { semesterExpanded = it },
+                    options = listOf("Semester 1", "Semester 2"),
+                    onOptionSelected = { selectedSemester = it },
+                    leadingIcon = Icons.Outlined.Event
+                )
+
+                if (authState is AuthState.Error) {
+                    Text(
+                        text = (authState as AuthState.Error).message,
+                        color = MaterialTheme.colorScheme.error,
+                        modifier = Modifier.padding(top = 8.dp)
+                    )
+                }
+
                 Spacer(modifier = Modifier.height(40.dp))
 
                 Button(
-                    onClick = onRegisterSuccess,
+                    onClick = {
+                        if (studentName.isNotBlank() && email.isNotBlank() && password.isNotBlank()) {
+                            val semester = if (selectedSemester == "Semester 2") "2" else "1"
+                            val deptId = departments.find { it.name == selectedDept }?.id ?: selectedDept
+                            
+                            viewModel.signUp(
+                                name = studentName.trim(),
+                                email = email.trim(),
+                                password = password.trim(),
+                                role = com.attendance.attendanceapp.domain.model.Role.student,
+                                studentId = studentId.trim(),
+                                departmentId = deptId,
+                                year = selectedYear,
+                                semester = semester
+                            )
+                        }
+                    },
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(56.dp),
+                    enabled = authState !is AuthState.Loading,
                     colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF006064)),
                     shape = RoundedCornerShape(16.dp)
                 ) {
-                    Text("Register", fontSize = 18.sp, fontWeight = FontWeight.Bold)
+                    if (authState is AuthState.Loading) {
+                        CircularProgressIndicator(color = Color.White, modifier = Modifier.size(24.dp))
+                    } else {
+                        Text("Register", fontSize = 18.sp, fontWeight = FontWeight.Bold)
+                    }
                 }
 
                 Spacer(modifier = Modifier.height(24.dp))
