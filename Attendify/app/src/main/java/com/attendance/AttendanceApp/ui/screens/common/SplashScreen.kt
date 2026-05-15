@@ -14,6 +14,12 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.School
+import androidx.compose.material3.Icon
+import androidx.compose.material3.Text
+import androidx.compose.ui.text.font.FontWeight
 import kotlinx.coroutines.delay
 
 @Composable
@@ -22,6 +28,8 @@ fun SplashScreen(
 ) {
     val context = LocalContext.current
     val alpha = remember { Animatable(0f) }
+    
+    val schoolColor = Color(0xFF006064)
     
     // Loading logo from assets
     val logoBitmap = remember {
@@ -39,7 +47,7 @@ fun SplashScreen(
             targetValue = 1f,
             animationSpec = tween(durationMillis = 1000)
         )
-        delay(2000) // Show for 2 seconds
+        delay(2000)
         onTimeout()
     }
 
@@ -49,14 +57,33 @@ fun SplashScreen(
             .background(Color.Black),
         contentAlignment = Alignment.Center
     ) {
-        if (logoBitmap != null) {
-            Image(
-                bitmap = logoBitmap.asImageBitmap(),
-                contentDescription = "Attendify Logo",
-                modifier = Modifier
-                    .size(200.dp)
-                    .alpha(alpha.value)
-            )
+        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+            if (logoBitmap != null) {
+                Image(
+                    bitmap = logoBitmap.asImageBitmap(),
+                    contentDescription = "Attendify Logo",
+                    modifier = Modifier
+                        .size(180.dp)
+                        .alpha(alpha.value)
+                )
+            } else {
+                Icon(
+                    imageVector = Icons.Default.School,
+                    contentDescription = null,
+                    modifier = Modifier
+                        .size(120.dp)
+                        .alpha(alpha.value),
+                    tint = schoolColor
+                )
+                Spacer(modifier = Modifier.height(16.dp))
+                Text(
+                    text = "Attendify",
+                    fontSize = 32.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = schoolColor,
+                    modifier = Modifier.alpha(alpha.value)
+                )
+            }
         }
     }
 }
