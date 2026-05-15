@@ -23,14 +23,20 @@ object FirebaseManager {
 
     /** Firestore instance with offline persistence enabled */
     val firestore: FirebaseFirestore by lazy {
-        FirebaseFirestore.getInstance().apply {
-            val cacheSettings = PersistentCacheSettings.newBuilder()
-                .setSizeBytes(FirebaseFirestoreSettings.CACHE_SIZE_UNLIMITED)
-                .build()
+        try {
+            FirebaseFirestore.getInstance().apply {
+                // Settings should be set before any other operations
+                val cacheSettings = PersistentCacheSettings.newBuilder()
+                    .setSizeBytes(FirebaseFirestoreSettings.CACHE_SIZE_UNLIMITED)
+                    .build()
 
-            firestoreSettings = FirebaseFirestoreSettings.Builder()
-                .setLocalCacheSettings(cacheSettings)
-                .build()
+                firestoreSettings = FirebaseFirestoreSettings.Builder()
+                    .setLocalCacheSettings(cacheSettings)
+                    .build()
+            }
+        } catch (e: Exception) {
+            // Fallback to default instance if settings fail
+            FirebaseFirestore.getInstance()
         }
     }
 
@@ -45,6 +51,7 @@ object FirebaseManager {
     val schedulesCollection    get() = firestore.collection("schedules")
     val sessionsCollection     get() = firestore.collection("attendance_sessions")
     val attendanceCollection   get() = firestore.collection("attendance_records")
+    val notificationsCollection get() = firestore.collection("notifications")
 
     // ── Auth helpers ───────────────────────────────────────────────────────
 
