@@ -13,11 +13,14 @@ interface AttendanceRepository {
     suspend fun deleteSession(id: String)
     
     // Attendance Records
+    fun getAllAttendance(): Flow<List<Attendance>>
     fun getAttendanceBySession(sessionId: String): Flow<List<Attendance>>
     fun getAttendanceByStudent(studentId: String): Flow<List<Attendance>>
     suspend fun markAttendance(attendance: Attendance)
     suspend fun deleteAttendance(id: String)
     
     // Sync (if needed later)
+    suspend fun deactivateAllSessions()
     suspend fun syncWithBackend()
+    suspend fun findSessionByQrCode(qrCode: String): Session?
 }
