@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Attendify - Session Projection</title>
+    <!-- Include QRCode.js library -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap');
+
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Inter', sans-serif;
+            background-color: #006064; /* School Color */
+            color: white;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            text-align: center;
+        }
+
+        .container {
+            background-color: white;
+            color: #333;
+            padding: 40px 60px;
+            border-radius: 32px;
+            box-shadow: 0 16px 32px rgba(0,0,0,0.3);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        h1 {
+            margin-top: 0;
+            margin-bottom: 20px;
+            font-size: 2.5rem;
+            color: #006064;
+        }
+
+        #qrcode {
+            margin: 20px 0;
+            padding: 20px;
+            background: white;
+            border: 4px solid #f0f0f0;
+            border-radius: 16px;
+        }
+
+        .code-display {
+            font-size: 4rem;
+            font-weight: 800;
+            letter-spacing: 8px;
+            color: #006064;
+            margin: 10px 0;
+        }
+
+        .timer-display {
+            font-size: 2rem;
+            font-weight: 600;
+            margin-top: 20px;
+            padding: 10px 30px;
+            background-color: #f8f9fa;
+            border-radius: 100px;
+            color: #e53935;
+        }
+
+        .timer-expired {
+            color: gray;
+        }
+
+        .instructions {
+            margin-top: 10px;
+            font-size: 1.2rem;
+            color: #666;
+        }
+
+        .error {
+            color: #e53935;
+            font-weight: bold;
+            font-size: 1.5rem;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container" id="mainContainer">
+        <h1>Scan to Mark Attendance</h1>
+        
+        <!-- The QR Code goes here -->
+        <div id="qrcode"></div>
+        
+        <div class="instructions">Or enter code manually:</div>
+        <div class="code-display" id="codeText">------</div>
+        
+        <div class="timer-display" id="timer">Loading...</div>
+    </div>
+
+    <script>
+        // Parse URL parameters
+        const urlParams = new URLSearchParams(window.location.search);
+        const code = urlParams.get('code');
+        const endTime = parseInt(urlParams.get('endTime'), 10);
+
+        if (!code) {
+            document.getElementById('mainContainer').innerHTML = '<div class="error">No Session Code Provided.<br>Please open this page using the link shared from the Attendify app.</div>';
+        } else {
+            // Display code
+            document.getElementById('codeText').innerText = code;
+
+            // Generate QR Code
+            new QRCode(document.getElementById("qrcode"), {
+                text: code,
+                width: 350,
+                height: 350,
+                colorDark : "#006064",
+                colorLight : "#ffffff",
+                correctLevel : QRCode.CorrectLevel.H
+            });
+
+            // Handle Countdown Timer
+            if (endTime && !isNaN(endTime)) {
+                const timerElement = document.getElementById('timer');
+                
+                const updateTimer = () => {
+                    const now = Date.now();
+                    const distance = endTime - now;
+
+                    if (distance <= 0) {
+                        clearInterval(interval);
+                        timerElement.innerText = "Session Expired";
+                        timerElement.classList.add('timer-expired');
+                        document.getElementById('qrcode').style.opacity = "0.3";
+                        return;
+                    }
+
+                    const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+                    const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+                    timerElement.innerText = `Time Remaining: ${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+                };
+
+                updateTimer(); // run immediately
+                const interval = setInterval(updateTimer, 1000);
+            } else {
+                document.getElementById('timer').style.display = 'none';
+            }
+        }
+    </script>
+</body>
+</html>
