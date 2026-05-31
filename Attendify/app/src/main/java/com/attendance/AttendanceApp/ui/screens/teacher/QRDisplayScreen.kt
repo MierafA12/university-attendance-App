@@ -158,6 +158,31 @@ fun QRDisplayScreen(
 
             Spacer(modifier = Modifier.weight(1f))
 
+            val context = androidx.compose.ui.platform.LocalContext.current
+            
+            if (!isTimerFinished) {
+                OutlinedButton(
+                    onClick = {
+                        val sessionEndTime = currentSession?.let { it.date + (it.durationMinutes * 60 * 1000L) } ?: 0L
+                        // Using your actual Firebase Project URL
+                        val shareLink = "https://attendify-219da.web.app/?code=${currentSession?.qrCode}&endTime=$sessionEndTime"
+                        val sendIntent = android.content.Intent().apply {
+                            action = android.content.Intent.ACTION_SEND
+                            putExtra(android.content.Intent.EXTRA_TEXT, "Open this link on the classroom computer to project the QR code:\n$shareLink")
+                            type = "text/plain"
+                        }
+                        context.startActivity(android.content.Intent.createChooser(sendIntent, "Share to Projector"))
+                    },
+                    modifier = Modifier.fillMaxWidth().height(56.dp),
+                    shape = RoundedCornerShape(16.dp)
+                ) {
+                    Icon(Icons.Default.Share, contentDescription = null, modifier = Modifier.size(20.dp))
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Text("Share to Projector", fontSize = 18.sp, fontWeight = FontWeight.Bold, color = schoolColor)
+                }
+                Spacer(modifier = Modifier.height(16.dp))
+            }
+
             Button(
                 onClick = { 
                     currentSession?.let { viewModel.stopSession(it.id) }
