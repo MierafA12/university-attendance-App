@@ -18,6 +18,7 @@ Attendify is a modern mobile application designed to simplify attendance managem
 - Secure teacher dashboard
 - Generate unique 6-digit QR codes for attendance sessions
 - Real-time monitoring of students joining the session
+- share the session in web app by link 
 - View and manage existing attendance records
 - Access course schedules and student lists
 
@@ -60,6 +61,7 @@ Attendify is a modern mobile application designed to simplify attendance managem
   <img src="Attendify/app/src/main/assets/teacher schedule.jpg" width="22%" />
   <img src="Attendify/app/src/main/assets/teacherreport.jpg" width="22%" />
   <img src="Attendify/app/src/main/assets/session.jpg" width="22%" />
+  <img src="Attendify/app/src/main/assets/webapp.png" width="22%" />
   <img src="Attendify/app/src/main/assets/teacherhistory.jpg" width="22%" />
   <img src="Attendify/app/src/main/assets/adminhome.jpg" width="22%" />
   <img src="Attendify/app/src/main/assets/admin user management.jpg" width="22%" />
