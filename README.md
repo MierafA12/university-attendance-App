@@ -113,7 +113,6 @@ Open the project folder in **Android Studio (Hedgehog or newer)**.
 
 # 🔐 Security & Validation
 
-* **QR Validation**: Sessions are active for 15 minutes.
 * **Duplicate Prevention**: Students cannot mark attendance twice for the same session.
 * **Role-Based Access**: Secure routing based on user roles (Admin, Teacher, Student).
 * **Account Approval**: Students require Admin approval before they can scan.
