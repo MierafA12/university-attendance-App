@@ -80,4 +80,5 @@ dependencies {
     // Barcode Scanning
     implementation(libs.barcode.scanning)
     implementation("com.google.guava:guava:33.2.1-android")
+    implementation("com.google.zxing:core:3.5.3")
 }
