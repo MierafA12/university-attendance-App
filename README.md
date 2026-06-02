@@ -55,16 +55,16 @@ Attendify is a modern mobile application designed to simplify attendance managem
   <img src="Attendify/app/src/main/assets/studenthome .jpg" width="22%" />
   <img src="Attendify/app/src/main/assets/studentprofile.jpg" width="22%" />
   <img src="Attendify/app/src/main/assets/student course.jpg" width="22%" />
-  <img src="Attendify/app/src/main/assets/studenthistory.jpg" width="22%" />
+  <img src="Attendify/app/src/main/assets/student history.jpg" width="22%" />
   <img src="Attendify/app/src/main/assets/weeklyschedule.jpg" width="22%" />
   <img src="Attendify/app/src/main/assets/techer home.jpg" width="22%" />
   <img src="Attendify/app/src/main/assets/teacher schedule.jpg" width="22%" />
   <img src="Attendify/app/src/main/assets/teacherreport.jpg" width="22%" />
   <img src="Attendify/app/src/main/assets/session.jpg" width="22%" />
   <img src="Attendify/app/src/main/assets/webapp.png" width="22%" />
-  <img src="Attendify/app/src/main/assets/teacherhistory.jpg" width="22%" />
+  <img src="Attendify/app/src/main/assets/teacher history.jpg" width="22%" />
   <img src="Attendify/app/src/main/assets/adminhome.jpg" width="22%" />
-  <img src="Attendify/app/src/main/assets/admin user management.jpg" width="22%" />
+  <img src="Attendify/app/src/main/assets/adminusermanagement.jpg" width="22%" />
   <img src="Attendify/app/src/main/assets/profile.jpg" width="22%" />
   <img src="Attendify/app/src/main/assets/acadamic manage.jpg" width="22%" />
   <img src="Attendify/app/src/main/assets/admin report.jpg" width="22%" />
