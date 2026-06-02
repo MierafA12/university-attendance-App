@@ -52,9 +52,9 @@ Attendify is a modern mobile application designed to simplify attendance managem
 <p align="center">
   <img src="Attendify/app/src/main/assets/login.jpg" width="22%" />
   <img src="Attendify/app/src/main/assets/signup.jpg" width="22%" />
-  <img src="Attendify/app/src/main/assets/studenthome.jpg" width="22%" />
+  <img src="Attendify/app/src/main/assets/studenthome .jpg" width="22%" />
   <img src="Attendify/app/src/main/assets/studentprofile.jpg" width="22%" />
-  <img src="Attendify/app/src/main/assets/studentcourse.jpg" width="22%" />
+  <img src="Attendify/app/src/main/assets/student course.jpg" width="22%" />
   <img src="Attendify/app/src/main/assets/studenthistory.jpg" width="22%" />
   <img src="Attendify/app/src/main/assets/weeklyschedule.jpg" width="22%" />
   <img src="Attendify/app/src/main/assets/techer home.jpg" width="22%" />
