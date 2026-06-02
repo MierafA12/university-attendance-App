@@ -2,6 +2,8 @@ package com.attendance.attendanceapp.ui.screens.teacher
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -19,6 +21,7 @@ import androidx.compose.ui.unit.sp
 import com.attendance.attendanceapp.ui.screens.common.AttendifyTopBar
 import java.text.SimpleDateFormat
 import java.util.*
+import androidx.compose.ui.graphics.asImageBitmap
 
 @Composable
 fun QRDisplayScreen(
@@ -89,6 +92,7 @@ fun QRDisplayScreen(
         Column(
             modifier = Modifier
                 .fillMaxSize()
+                .verticalScroll(rememberScrollState())
                 .padding(24.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
@@ -119,12 +123,24 @@ fun QRDisplayScreen(
                     verticalArrangement = Arrangement.Center
                 ) {
                     if (currentSession != null) {
-                        Icon(
-                            imageVector = Icons.Default.QrCode,
-                            contentDescription = "QR Code",
-                            modifier = Modifier.size(150.dp),
-                            tint = if (isTimerFinished) Color.Gray else schoolColor
-                        )
+                        val qrBitmap = rememberQrBitmap(currentSession.qrCode, 512)
+                        if (qrBitmap != null) {
+                            androidx.compose.foundation.Image(
+                                bitmap = qrBitmap,
+                                contentDescription = "QR Code",
+                                modifier = Modifier.size(150.dp),
+                                colorFilter = androidx.compose.ui.graphics.ColorFilter.tint(
+                                    if (isTimerFinished) Color.Gray else schoolColor
+                                )
+                            )
+                        } else {
+                            Icon(
+                                imageVector = Icons.Default.QrCode,
+                                contentDescription = "QR Code",
+                                modifier = Modifier.size(150.dp),
+                                tint = if (isTimerFinished) Color.Gray else schoolColor
+                            )
+                        }
                         Spacer(modifier = Modifier.height(16.dp))
                         Text(
                             text = "Code: ${currentSession.qrCode}",
@@ -156,7 +172,7 @@ fun QRDisplayScreen(
                 SessionStatItem("Time Remaining", timeLeft, Icons.Default.Timer, if (isTimerFinished) Color.Gray else Color.Red)
             }
 
-            Spacer(modifier = Modifier.weight(1f))
+            Spacer(modifier = Modifier.height(32.dp))
 
             val context = androidx.compose.ui.platform.LocalContext.current
             
@@ -226,3 +242,34 @@ fun SessionStatItem(label: String, value: String, icon: ImageVector, color: Colo
         Text(text = label, fontSize = 12.sp, color = Color.Gray)
     }
 }
+
+@Composable
+fun rememberQrBitmap(content: String, sizePx: Int): androidx.compose.ui.graphics.ImageBitmap? {
+    return remember(content, sizePx) {
+        if (content.isEmpty()) return@remember null
+        try {
+            val bitMatrix = com.google.zxing.qrcode.QRCodeWriter().encode(
+                content,
+                com.google.zxing.BarcodeFormat.QR_CODE,
+                sizePx,
+                sizePx
+            )
+            val width = bitMatrix.width
+            val height = bitMatrix.height
+            val bitmap = android.graphics.Bitmap.createBitmap(width, height, android.graphics.Bitmap.Config.ARGB_8888)
+            for (x in 0 until width) {
+                for (y in 0 until height) {
+                    bitmap.setPixel(
+                        x,
+                        y,
+                        if (bitMatrix.get(x, y)) android.graphics.Color.BLACK else android.graphics.Color.TRANSPARENT
+                    )
+                }
+            }
+            bitmap.asImageBitmap()
+        } catch (e: Exception) {
+            null
+        }
+    }
+}
+
