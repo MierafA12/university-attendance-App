@@ -62,9 +62,9 @@ Attendify is a modern mobile application designed to simplify attendance managem
   <img src="Attendify/app/src/main/assets/teacherreport.jpg" width="22%" />
   <img src="Attendify/app/src/main/assets/session.jpg" width="22%" />
   <img src="Attendify/app/src/main/assets/webapp.png" width="22%" />
-  <img src="Attendify/app/src/main/assets/teacher history.jpg" width="22%" />
-  <img src="Attendify/app/src/main/assets/adminhome.jpg" width="22%" />
-  <img src="Attendify/app/src/main/assets/adminusermanagement.jpg" width="22%" />
+  <img src="Attendify/app/src/main/assets/techer history.jpg" width="22%" />
+  <img src="Attendify/app/src/main/assets/admin home.jpg" width="22%" />
+  <img src="Attendify/app/src/main/assets/adminusermanagment.jpg" width="22%" />
   <img src="Attendify/app/src/main/assets/profile.jpg" width="22%" />
   <img src="Attendify/app/src/main/assets/acadamic manage.jpg" width="22%" />
   <img src="Attendify/app/src/main/assets/admin report.jpg" width="22%" />
