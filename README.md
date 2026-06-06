@@ -118,6 +118,13 @@ Open the project folder in **Android Studio (Hedgehog or newer)**.
 * **Account Approval**: Students require Admin approval before they can scan.
 
 ---
+# contributers
+ 1.Mieraf Abebe
+ 2.Melat Worku
+ 3.Bethel zewdu
+ 4.Lidiya Shenkut
+ 5.Tsedeniya Yeshibelay
+ 6.Bethelihem Mulugeta
 
 # 📄 License
 
